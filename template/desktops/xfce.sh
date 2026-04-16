@@ -65,4 +65,4 @@ xfsettingsd --sm-client-disable &
 # Load package
 module load ${paraview_module}
 
-paraview
+pvserver
