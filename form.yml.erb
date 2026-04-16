@@ -1,0 +1,80 @@
+<%-
+  groups = OodSupport::User.new.groups.sort_by(&:id).tap { |groups|
+    groups.unshift(groups.delete(OodSupport::Process.group))
+  }.map(&:name).grep(/.*[0-9]{5}/)
+
+  all_groups = OodSupport::User.new.groups.sort_by(&:id).tap { |groups|
+    groups.unshift(groups.delete(OodSupport::Process.group))
+  }.map(&:name)
+  has_slurm_apps = all_groups.include?("nesi-staff") || all_groups.include?("ondemand-slurm-apps")
+-%>
+---
+title: "Paraview"
+
+description: |
+  This app will launch a Paraview session
+attributes:
+  # select the cluster
+  cluster:
+    widget: "select"
+    options:
+      - [
+          "Kubernetes", "my-k8s-cluster",
+        ]
+<% if has_slurm_apps %>
+      - ["Slurm HPC", "nesi_tdc_hpc"]
+    help: |
+      Kubernetes jobs are more likely to start promptly - "Slurm HPC" jobs may have to wait in the queue.
+      If you need Apptainer or GPUs then you must choose "Slurm HPC" currently.
+<% end %>
+    cacheable: false  # we always want k8s at the top?
+
+  bc_vnc_resolution:
+    required: true
+  account:
+    label: "Project Code"
+    widget: select
+    options:
+      <%- groups.each do |group| %>
+      - "<%= group %>"
+      <%- end %>
+    required: true
+    display: true
+  paraview_module:
+    widget: select
+    label: "Paraview module"
+    options:
+      - [ "ParaView 6.0.1", "ParaView/6.0.1-foss-2023a-Python-3.11.6" ]
+      - [ "ParaView 5.9.0", "ParaView/5.9.0-gimkl-2020a-Python-3.8.2" ]
+      - [ "ParaView 5.6.0", "ParaView/5.6.0-gimkl-2018b-Python-3.7.3" ]
+      - [ "ParaView 5.4.1", "ParaView/5.4.1-gimkl-2018b-Python-2.7.16" ]
+    cacheable: false  # default to latest (first in list)
+  bc_num_hours:
+    max: 24
+    min: 1
+    step: 1
+    value: 1
+    widget: number_field
+  num_cores:
+    label: Number of cores
+    max: 4
+    min: 1
+    value: 2
+    widget: number_field
+    display: true
+  num_mem:
+    label: Memory per job (GB)
+    max: 16
+    min: 2
+    step: 1
+    value: 2
+    widget: number_field
+    display: true
+form:
+  - cluster
+  - account
+  - paraview_module
+  - bc_vnc_resolution
+  - bc_num_hours
+  - num_cores
+  - num_mem
