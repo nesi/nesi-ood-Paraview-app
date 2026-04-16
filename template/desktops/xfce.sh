@@ -28,15 +28,6 @@ for service in "pulseaudio" "rhsm-icon" "spice-vdagent" "tracker-extract" "track
   echo -e "[Desktop Entry]\nHidden=true" > "${AUTOSTART}/${service}.desktop"
 done
 
-# This entry will force vmd to start when xfce4-session begins
-echo -e "[Desktop Entry]
-Type=Application
-Name=VMD
-Exec=xfce4-terminal --hold -e \"bash -l -c 'module load ${vmd_module}; vmd'\"
-Terminal=false
-StartupNotify=false
-" > "${AUTOSTART}/VMD.desktop"
-
 # Run Xfce4 Terminal as login shell (sets proper TERM)
 TERM_CONFIG="${HOME}/.config/xfce4/terminal/terminalrc"
 if [[ ! -e "${TERM_CONFIG}" ]]; then
@@ -70,5 +61,8 @@ xfwm4 --compositor=off --sm-client-disable &
 xsetroot -solid "#D3D3D3" &
 xfsettingsd --sm-client-disable &
 #xfce4-panel --sm-client-disable &
+
+# Load package
+module load ${paraview_module}
 
 paraview
