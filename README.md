@@ -1,1 +1,1 @@
-# nesi-ood-VMD-app
+# nesi-ood-Paraview-app
